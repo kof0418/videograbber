@@ -11,7 +11,7 @@ public partial class MainWindow : Window
     public ObservableCollection<DownloadJob> Jobs { get; } = [];
     private readonly AppSettings settings;
     private string cookieFile = "";
-    private bool pumping, paused, closing;
+    private bool pumping, paused, closing, closeReady;
     private CancellationTokenSource? activeCancellation, installCancellation;
     private Task? pumpTask, installTask;
     private DownloadJob? active;
@@ -201,11 +201,16 @@ public partial class MainWindow : Window
     { if (JobsList.SelectedItem is DownloadJob job) MessageBox.Show(this, $"{job.Title}\n{job.Url}\n\n{job.Status}\n{job.Detail}", "工作詳情", MessageBoxButton.OK, MessageBoxImage.Information); }
     private async void Window_Closing(object? sender, CancelEventArgs e)
     {
+        if (closeReady) return;
+        e.Cancel = true;
         if (closing) return;
-        e.Cancel = true; closing = true; IsEnabled = false;
+        closing = true; IsEnabled = false;
+        // Unwind the original Closing event even when there is no asynchronous work.
+        // WPF rejects a nested Close() while that event is still running.
+        await System.Windows.Threading.Dispatcher.Yield();
         activeCancellation?.Cancel(); installCancellation?.Cancel();
         try { if (pumpTask != null) await pumpTask; if (installTask != null) await installTask; } catch (Exception) { /* Failure already displayed by owning operation. */ }
         foreach (var job in Jobs.Where(j => j.Status == "等待中")) { job.Status = "已中斷"; job.Detail = "程式已關閉，可重新下載。"; }
-        ReadSettings(); Persist(); Close();
+        ReadSettings(); Persist(); closeReady = true; Close();
     }
 }

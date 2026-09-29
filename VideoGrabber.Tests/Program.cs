@@ -8,6 +8,7 @@ using System.Windows.Media.Imaging;
 
 if (args.Contains("--integration")) { await IntegrationChecks.Run(); return; }
 if (args.Contains("--queue-regression")) { QueueRegression.Run(); return; }
+if (args.Contains("--close-regression")) { CloseRegression.Run(); return; }
 
 if (args.Contains("--install-engine"))
 {

@@ -9,6 +9,8 @@ if ($LASTEXITCODE -ne 0) { throw 'Restore failed' }
 if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
 & $sdk run --project VideoGrabber.Tests -c Release --no-build
 if ($LASTEXITCODE -ne 0) { throw 'Tests failed' }
+& $sdk run --project VideoGrabber.Tests -c Release --no-build -- --close-regression
+if ($LASTEXITCODE -ne 0) { throw 'Close regression failed' }
 if ($Publish) {
     & $sdk publish VideoGrabber/VideoGrabber.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:RestoreConfigFile="$PWD/NuGet.Config" -o artifacts/VideoGrabber-win-x64
     if ($LASTEXITCODE -ne 0) { throw 'Publish failed' }
