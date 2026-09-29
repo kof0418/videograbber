@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>VideoGrabber</AssemblyName>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Plugins/threads/yt_dlp_plugins/extractor/threads.py" LogicalName="ThreadsExtractor" />
+    <EmbeddedResource Include="Plugins/threads/LICENSE" LogicalName="ThreadsLicense" />
+  </ItemGroup>
+</Project>

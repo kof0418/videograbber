@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="VideoGrabber/VideoGrabber.csproj" />
+  <Project Path="VideoGrabber.Tests/VideoGrabber.Tests.csproj" />
+</Solution>

@@ -1,0 +1,78 @@
+<Window x:Class="VideoGrabber.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Style="{StaticResource {x:Type Window}}" Title="VideoGrabber · 網頁影片下載工具" Width="1180" Height="860" MinWidth="900" MinHeight="700" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+ <Grid Margin="28,24" Background="#F3F6FA">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <Grid Margin="0,0,0,22">
+   <StackPanel><TextBlock Text="VideoGrabber" FontSize="30" FontWeight="Bold"/><TextBlock Text="將喜歡的影片，收藏在自己的電腦。" Foreground="#64748B" Margin="0,4,0,0"/></StackPanel>
+   <Border HorizontalAlignment="Right" VerticalAlignment="Center" Background="#E1F3EF" CornerRadius="16" Padding="14,7"><TextBlock Text="YouTube  /  Facebook  /  Instagram  /  Threads" Foreground="#22786D" FontSize="12"/></Border>
+  </Grid>
+  <TabControl Grid.Row="1" Background="Transparent" BorderThickness="0" Padding="0,16,0,0">
+   <TabItem Header="  下載工作區  ">
+    <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+     <Border Style="{StaticResource Card}"><StackPanel>
+      <Border x:Name="SetupBanner" Background="#FFF3D8" CornerRadius="8" Padding="12" Margin="0,0,0,14" Visibility="Collapsed">
+       <DockPanel><Button x:Name="SetupInstallButton" DockPanel.Dock="Right" Content="安裝引擎並繼續" Click="Install_Click" Background="#2168E8" Foreground="White" Margin="12,0,0,0"/>
+        <TextBlock x:Name="SetupText" Text="首次使用需安裝下載引擎。網址可先加入佇列，安裝完成後自動下載。" TextWrapping="Wrap" VerticalAlignment="Center"/>
+       </DockPanel>
+      </Border>
+      <TextBlock Text="01  貼上影片網址" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10"/>
+      <TextBox x:Name="UrlsBox" Height="78" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" ToolTip="每行一個 HTTPS 影片網址；不會自動展開整個播放清單。" AutomationProperties.Name="影片網址，每行一筆"/>
+      <Grid Margin="0,12,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+       <StackPanel Orientation="Horizontal">
+        <ComboBox x:Name="QualityBox" Width="155" SelectedValuePath="Tag" Margin="0,0,10,0" AutomationProperties.Name="畫質上限"><ComboBoxItem Content="最高可用畫質" Tag="best"/><ComboBoxItem Content="最高 2160p / 4K" Tag="2160"/><ComboBoxItem Content="最高 1080p" Tag="1080"/><ComboBoxItem Content="最高 720p" Tag="720"/><ComboBoxItem Content="最高 480p" Tag="480"/></ComboBox>
+        <ComboBox x:Name="FormatBox" Width="145" SelectedValuePath="Tag" Margin="0,0,12,0" AutomationProperties.Name="輸出格式"><ComboBoxItem Content="MP4 影片" Tag="MP4"/><ComboBoxItem Content="MKV 原始編碼" Tag="MKV"/><ComboBoxItem Content="MP3 純音訊" Tag="MP3"/></ComboBox>
+        <CheckBox x:Name="SubtitlesBox" Content="中英字幕" ToolTip="有提供時儲存 SRT 字幕，包括自動字幕。"/>
+       </StackPanel>
+       <StackPanel Grid.Column="1" Orientation="Horizontal"><Button Content="貼上" Click="Paste_Click"/><Button x:Name="AddButton" Content="＋ 加入下載" Background="#2168E8" Foreground="White" Click="Add_Click" Margin="0"/></StackPanel>
+      </Grid>
+      <TextBlock Text="每行一個網址 · 自動依序下載 · 畫質依來源提供，轉檔時可能需要較長時間" Foreground="#64748B" FontSize="12" Margin="0,12,0,0"/>
+     </StackPanel></Border>
+     <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0"><Grid>
+      <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+      <DockPanel Margin="0,0,0,12"><TextBlock Text="02  下載佇列與歷史" FontSize="18" FontWeight="SemiBold"/><TextBlock x:Name="CountText" HorizontalAlignment="Right" Foreground="#64748B"/></DockPanel>
+      <TextBlock Grid.Row="1" Text="佇列尚未有影片&#10;貼上網址，開始第一筆下載。" TextAlignment="Center" VerticalAlignment="Center" Foreground="#8491A3" FontSize="16" LineHeight="28"><TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding Jobs.Count}" Value="0"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></TextBlock.Style></TextBlock>
+      <ListView x:Name="JobsList" Grid.Row="1" ItemsSource="{Binding Jobs}" BorderThickness="0" Background="Transparent" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" SelectionMode="Single">
+       <ListView.ItemContainerStyle><Style TargetType="ListViewItem"><Setter Property="Padding" Value="8,10"/><Setter Property="Margin" Value="0,0,0,6"/><Setter Property="HorizontalContentAlignment" Value="Stretch"/></Style></ListView.ItemContainerStyle>
+       <ListView.ItemTemplate><DataTemplate><Grid><Grid.ColumnDefinitions><ColumnDefinition Width="90"/><ColumnDefinition Width="*"/><ColumnDefinition Width="100"/></Grid.ColumnDefinitions>
+        <TextBlock Text="{Binding Platform}" Foreground="#2168E8" FontWeight="SemiBold" VerticalAlignment="Center"/>
+        <StackPanel Grid.Column="1" Margin="8,0,18,0"><TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/><TextBlock Text="{Binding Url}" Foreground="#8491A3" FontSize="11" TextTrimming="CharacterEllipsis" Margin="0,3,0,4"/>
+         <ProgressBar Value="{Binding Progress}" Height="5" Maximum="100" Foreground="#2168E8" Background="#E8EEF6" BorderThickness="0"/>
+         <TextBlock Text="{Binding Detail}" Foreground="#64748B" FontSize="12" TextTrimming="CharacterEllipsis" MaxHeight="34" Margin="0,4,0,0"/>
+        </StackPanel><TextBlock Grid.Column="2" Text="{Binding Status}" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+       </Grid></DataTemplate></ListView.ItemTemplate>
+      </ListView>
+      <WrapPanel Grid.Row="2" Margin="0,14,0,0"><Button Content="取消所選" Click="Cancel_Click"/><Button x:Name="PauseButton" Content="暫停佇列" Click="Pause_Click"/><Button Content="重新下載" Click="Retry_Click"/><Button Content="開啟位置" Click="OpenFile_Click"/><Button Content="查看詳情" Click="Details_Click"/><Button Content="清除已結束" Click="Clear_Click"/></WrapPanel>
+     </Grid></Border>
+    </Grid>
+   </TabItem>
+   <TabItem Header="  設定與引擎  "><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel>
+    <Border Style="{StaticResource Card}"><StackPanel>
+     <TextBlock Text="儲存位置" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
+     <DockPanel><Button DockPanel.Dock="Right" Content="瀏覽…" Click="Folder_Click" Margin="10,0,0,0"/><TextBox x:Name="FolderBox" AutomationProperties.Name="下載資料夾"/></DockPanel>
+     <TextBlock Text="每筆工作加入時會記住當下的資料夾、畫質與格式。" Foreground="#64748B" Margin="0,8,0,0"/>
+    </StackPanel></Border>
+    <Border Style="{StaticResource Card}"><StackPanel>
+     <TextBlock Text="登入與存取" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10"/>
+     <TextBlock Text="公開影片通常不需登入。如平台要求登入，可選擇已登入的瀏覽器，或匯入 Netscape 格式 Cookie 檔。" TextWrapping="Wrap" Foreground="#64748B" Margin="0,0,0,12"/>
+     <ComboBox x:Name="BrowserBox" Width="240" HorizontalAlignment="Left" SelectedValuePath="Tag" AutomationProperties.Name="登入來源"><ComboBoxItem Content="不使用登入資訊" Tag="none"/><ComboBoxItem Content="Firefox" Tag="firefox"/><ComboBoxItem Content="Chrome" Tag="chrome"/><ComboBoxItem Content="Microsoft Edge" Tag="edge"/></ComboBox>
+     <WrapPanel Margin="0,12,0,0"><Button Content="選擇 Cookie 檔…" Click="Cookie_Click"/><Button Content="移除 Cookie 檔" Click="RemoveCookie_Click"/><TextBlock x:Name="CookieLabel" Text="未選擇（僅本次執行使用）" VerticalAlignment="Center" Foreground="#64748B"/></WrapPanel>
+     <TextBlock Text="Cookie 檔優先於瀏覽器設定。程式不儲存帳號密碼；Cookie 請勿分享。瀏覽器加密限制可能導致讀取失敗。" TextWrapping="Wrap" Foreground="#64748B" Margin="0,12,0,0"/>
+    </StackPanel></Border>
+    <Border Style="{StaticResource Card}"><StackPanel>
+     <TextBlock Text="下載引擎" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,10"/>
+     <TextBlock x:Name="EngineText" TextWrapping="Wrap" Margin="0,0,0,12"/>
+     <WrapPanel><Button x:Name="InstallButton" Content="安裝／更新引擎" Background="#2168E8" Foreground="White" Click="Install_Click"/><Button x:Name="CancelInstallButton" Content="取消安裝" IsEnabled="False" Click="CancelInstall_Click"/></WrapPanel>
+     <TextBlock Text="從官方 GitHub 發行頁下載 yt-dlp、FFmpeg、Deno（Windows x64）；初次安裝需網路與數百 MB 空間。" TextWrapping="Wrap" Foreground="#64748B" Margin="0,12,0,0"/>
+    </StackPanel></Border>
+    <WrapPanel><Button Content="儲存設定" Click="Save_Click"/><Button Content="開啟下載資料夾" Click="OpenFolder_Click"/></WrapPanel>
+   </StackPanel></ScrollViewer></TabItem>
+   <TabItem Header="  使用說明  "><Border Style="{StaticResource Card}" VerticalAlignment="Top"><StackPanel>
+    <TextBlock Text="從網址到本機，三個步驟。" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,20"/>
+    <TextBlock Text="1. 在「設定與引擎」安裝下載引擎，選擇儲存位置。&#10;&#10;2. 貼上 YouTube、Facebook、Instagram 或 Threads 的影片網址。&#10;&#10;3. 選擇畫質與格式，按「加入下載」，完成後按「開啟位置」。" TextWrapping="Wrap" FontSize="16" LineHeight="26"/>
+    <Separator Margin="0,22"/>
+    <TextBlock Text="• 批次：每行貼上一個網址，同時只處理一筆，降低平台限流。&#10;• 暫停佇列：目前工作繼續，後續工作等待；取消可停止目前工作。&#10;• 重新下載：保留的 .part 檔案可由引擎嘗試續傳；完整檔案不覆寫。&#10;• 字幕：來源有提供時，另外儲存中英文 SRT 檔。&#10;• MP4：優先 H.264／AAC；來源不相容時可能轉檔。MKV 保留來源編碼。&#10;• 登入、地區、年齡限制或平台改版可能導致失敗，請查看詳情並更新引擎。&#10;• 一篇貼文含多部影片時，引擎可能下載多個檔案；清單顯示最後一個。&#10;• 關閉後，未完成工作會標記為已中斷，重新開啟後可手動重試。" TextWrapping="Wrap" Foreground="#64748B" LineHeight="28"/>
+    <TextBlock Text="Threads 使用專用解析擴充，僅支援可公開存取的影片貼文。請只下載您擁有或已取得授權的內容。本工具不繞過 DRM，也不保證所有網址皆可下載。" TextWrapping="Wrap" Margin="0,22,0,0" Foreground="#64748B"/>
+   </StackPanel></Border></TabItem>
+  </TabControl>
+  <TextBlock x:Name="StatusText" Grid.Row="2" Text="準備就緒" Foreground="#64748B" Margin="0,14,0,0" TextWrapping="Wrap"/>
+ </Grid>
+</Window>
