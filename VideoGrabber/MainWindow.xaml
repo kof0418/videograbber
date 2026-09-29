@@ -1,4 +1,4 @@
-<Window x:Class="VideoGrabber.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Style="{StaticResource {x:Type Window}}" Title="VideoGrabber · 網頁影片下載工具" Width="1180" Height="860" MinWidth="900" MinHeight="700" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
+<Window x:Class="VideoGrabber.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Style="{StaticResource {x:Type Window}}" Icon="Assets/VideoGrabber.ico" Title="VideoGrabber · 網頁影片下載工具" Width="1180" Height="860" MinWidth="900" MinHeight="700" WindowStartupLocation="CenterScreen" Closing="Window_Closing">
  <Grid Margin="28,24" Background="#F3F6FA">
   <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
   <Grid Margin="0,0,0,22">
